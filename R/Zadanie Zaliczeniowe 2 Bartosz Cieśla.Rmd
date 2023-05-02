@@ -1,0 +1,517 @@
+---
+title: "Zadanie Zaliczeniowe 2"
+author: "Bartosz Cieśla"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Sposób wyszukiwania zbiorów 
+W celu wykonania zadania przejrzałem następujące repozytoria danych:\
+Machine Learning Repository https://archive.ics.uci.edu/ml/index.php \
+Kaggle https://www.kaggle.com/ \
+Rdatasets https://vincentarelbundock.github.io/Rdatasets/datasets.html \
+
+Odpowiednią zaawansowaną wyszukiwarkę oferuje tylko repozytorium Machine Learning Repository. Korzystając z niej, szukałem zbiorów danych, które mają jak największą liczbę obserwacji i liczbę zmiennych oraz uwzględniają tak zmienne kategoryczne, jak i ciągłe. 
+
+## Odrzucone zbiory danych 
+```{r}
+library(knitr)
+library(kableExtra)
+Nazwy <- c("Australian Sign Language signs Data Set","Credit Approval Data Set","Cylinder Bands Data Set
+","Dermatology Data Set","Echocardiogram Data Set","Flags Data Set","Heart Disease Data Set", "Hepatitis Data Set", "Horse Colic Data Set", "Pittsburgh Bridges Data Set", "University Data Set", "Zoo Data Set", "Top American Colleges 2022", "Cats and Dogs image classification", "Fast Food Joint Nutrition Values Dataset", "New York City Bus Breakdown and Delays", "Patents and trademarks by country of origin", "Breast Cancer Dataset", "Gender Determination with Morphometry of Eyes", "Wheat Prices - Historical Annual Data", "Carvana - Predict Car Prices", "Analyzing Customer Spending Habits", "GDP Data Worldwide (1960-2021)", "Fair's Extramarital Affairs Data", "Consumer Price Index in Argentina Description", "Bank Wages Description", "Benderly and Zwick Data: Inflation, Growth and Stock Returns Description", "Bond Yield Data", "CartelStability", "California Test Score Data", "Chinese Real National Income Data", "Properties of a Fast-Moving Consumer Good", "Determinants of Wages Data (CPS 1985)", "Dow Jones Index Data (Franses)", "US Traffic Fatalities", "Abalone Data Set")
+
+Adresy <- c("https://archive.ics.uci.edu/ml/datasets/Australian+Sign+Language+signs","https://archive.ics.uci.edu/ml/datasets/credit+approval", "https://archive.ics.uci.edu/ml/datasets/Cylinder+Bands", "https://archive.ics.uci.edu/ml/datasets/dermatology", "https://archive.ics.uci.edu/ml/datasets/echocardiogram"
+,"https://archive.ics.uci.edu/ml/datasets/Flags", "https://archive.ics.uci.edu/ml/datasets/Heart+Disease", "https://archive.ics.uci.edu/ml/datasets/hepatitis", "https://archive.ics.uci.edu/ml/datasets/Horse+Colic", "https://archive.ics.uci.edu/ml/datasets/Pittsburgh+Bridges", "https://archive.ics.uci.edu/ml/datasets/University", "https://archive.ics.uci.edu/ml/datasets/Zoo","https://www.kaggle.com/datasets/kabhishm/top-american-colleges-2022",  "https://www.kaggle.com/datasets/samuelcortinhas/cats-and-dogs-image-classification", "https://www.kaggle.com/datasets/rakkesharv/fast-food-joint-nutrition-values-dataset", "https://www.kaggle.com/datasets/mattop/new-york-city-bus-breakdown-and-delays", "https://www.kaggle.com/datasets/kabhishm/patents-and-trademarks-by-country-of-origin", "https://www.kaggle.com/datasets/nancyalaswad90/breast-cancer-dataset", "https://www.kaggle.com/datasets/gauravduttakiit/gender-determination-with-morphometry-of-eyes", "https://www.kaggle.com/datasets/kabhishm/wheat-prices-historical-annual-data", "https://www.kaggle.com/datasets/ravishah1/carvana-predict-car-prices", "https://www.kaggle.com/datasets/thedevastator/analyzing-customer-spending-habits-to-improve-sa", "https://www.kaggle.com/datasets/mukhazarahmad/gdp-data-worldwide-19602021", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/Affairs.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/ArgentinaCPI.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/BankWages.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/BenderlyZwick.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/BondYield.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/CartelStability.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/CASchools.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/ChinaIncome.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/ConsumerGood.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/CPS1985.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/DJFranses.html", "https://vincentarelbundock.github.io/Rdatasets/doc/AER/Fatalities.html", "https://archive.ics.uci.edu/ml/datasets/abalone")
+
+Przyczny <- c("szereg czasowy", " mało obserwacji", " mało obserwacji"," mało obserwacji", " mało obserwacji", " mało obserwacji", " mało obserwacji"," mało obserwacji"," mało obserwacji","mało obserwacji"," mało obserwacji"," mało obserwacji", " mało obserwacji", "obrazy", "mało obserwacji", "brak zmiennej modelowanej", "szereg czasowy", "mało zmiennych kategorycznych", "obrazy", "szereg czasowy", "mało zmiennych", "brak zmiennej modelowanej", "szereg czasowy", "mało zmiennych kategorycznych", "szereg czasowy", "mało obserwacji", "szereg czasowy", "szereg czasowy", "mało obserwacji", "mało obserwacji", "szereg czasowy", "szereg czasowy", "mało obserwacji", "szereg czasowy", "mało obserwacji", "mało zmiennych kategorycznych")
+
+Odrzucone_Zbiory_Danych <- data.frame("Nazwa" = Nazwy, "Adres" = Adresy, "Przyczyna" = Przyczny)
+kable(Odrzucone_Zbiory_Danych, caption = "Odrzucone Zbiory Danych", align = c("c", "c", "c")) %>%
+  kable_styling(full_width = F, font_size = 12, position = "center", bootstrap_options = "striped")
+```
+
+## Zbiory najlepiej spełniające wymagania
+
+### Data Analysis on Diamonds Dataset
+https://www.kaggle.com/datasets/swatikhedekar/price-prediction-of-diamond
+
+Ten zbiór danych ma na celu przewidywanie cen diamentów.\
+Zawiera 53940 obserwacji 10 zmiennych (7 ciągłych i 3 kategoryczne). \
+
+Zmienne to:\
+`price`- cena w dolarach amerykańskich (zmienna ciągła).\
+`carat`- waga diamentu w karatach (zmienna ciągła).\
+`cut`- jakość szlifu diamentu (zmienna kategoryczna, poziomy: Fair, Good, Very Good, Premium, Ideal).\
+`color`- kolor diamentu (zmienna kategoryczna, poziomy: D(najlepszy), E, F, G, H, I, J(najgorszy).\
+`clarity`- czystość diamentu (zmienna kategoryczna, poziomy: I1(najgorsza), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (najlepsza).\
+`x`- długość w mm (zmienna ciągła).\
+`y`- szerokość w mm (zmienna ciągła).\
+`z`- głębokość w mm (zmienna ciągła).\
+`depth`- wysokość diamentu podzielona przez średnią średnicę obręczy (zmienna ciągła).\
+`table`- szerokość wierzchołka diamentu względem najszerszego punktu (zmienna ciągła).\
+
+Główną kolumną modelowaną przez dane jest `price`.
+
+### Music & Mental Health Survey Results
+https://www.kaggle.com/datasets/catherinerasgaitis/mxmh-survey-results
+
+Ten zbiór zawiera wyciąg surowych danych z formularza Google dotyczącego gustu muzycznego i zdrowia psychicznego. 
+Zawiera 736 obserwacji 33 zmiennych ( w tym 4 ciągłe i 29 kategorycznych). Jego zadaniem jest zbadanie wpływu słuchanej muzyki na deklarowane zdrowie psychiczne. 
+
+Zmienne to:\
+`Timestamp Date` - Data i godzina przesłania formularza (zmienna ciągła).\
+`Age` - Wiek respondenta (zmienna ciągła).\
+`Primary streaming service` - Podstawowa usługa przesyłania strumieniowego respondenta (zmienna kategoryczna, poziomy: Spotify, Pandora, YouTube Music, I do not use a streaming service., Apple Music, Other streaming service).\
+`Hours per day` - Liczba godzin słuchania muzyki przez respondenta w ciągu dnia (zmienna ciągła).
+`While working` - Czy respondent słucha muzyki podczas nauki/pracy? (zmienna kategoryczna, poziomy: YES, NO).\
+`Instrumentalist` - Czy respondent regularnie gra na jakimś instrumencie? (zmienna kategoryczna, poziomy YES, NO).\
+`Composer` - Czy respondent komponuje muzykę? (zmienna kategoryczna, poziomy: YES, NO).\
+`Fav genre` - Ulubiony gatunek respondenta (zmienna kategoryczna, poziomy: Classical, Country, EDM, Folk, Gospel, Hip hop, Jazz, K pop, Latin, Lofi, Metal, Pop, R&B, Rock, Video game music).\
+`Exploratory` - Czy respondent aktywnie odkrywa nowych artystów/gatunki? (zmienna kategoryczna, poziomy YES, NO).\
+`Foreign languages` - Czy respondent regularnie słucha muzyki z tekstami w języku, którego nie zna? (zmienna kategoryczna, poziomy: YES, NO).\
+`BPM` - Uderzenia na minutę ulubionego gatunku\ (zmienna ciągła).\
+`Frequency [Classical]` - Jak często respondent słucha muzyki klasycznej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Country]` - Jak często respondent słucha muzyki country (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [EDM]` - Jak często respondent słucha muzyki EDM (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Folk]` - Jak często respondent słucha muzyki ludowej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Gospel]` - Jak często respondent słucha muzyki gospel (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Hip hop]` - Jak często respondent słucha muzyki hip-hopowej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Jazz]` - Jak często respondent słucha muzyki jazzowej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [K pop]` - Jak często respondent słucha muzyki K pop (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Latin]` - Jak często respondent słucha muzyki latynoskiej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Lofi]` - Jak często respondent słucha muzyki lo-fi (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Metal]` - Jak często respondent słucha muzyki metalowej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Pop]` - Jak często respondent słucha muzyki pop (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [R&B]` - Jak często respondent słucha muzyki R&B (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Rap]` - Jak często respondent słucha rapu (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Rock]` - Jak często respondent słucha muzyki rockowej (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Frequency [Video game music]` - Jak często respondent słucha muzyki z gier wideo (zmienna kategoryczna, poziomy: Never, Rarely, Sometimes, Very frequently).\
+`Anxiety` - Deklaracja dotycząca siły odczuwanego przez respondenta lęku w skali od 0 do 10 (zmienna kategoryczna).\
+`Depression` - Deklaracja dotycząca siły stanów depresyjnych respondenta w skali od 0 do 10 (zmienna kategoryczna).\
+`Insomnia` - Deklaracja dotycząca problemu bezsenności respondenta w skali od 0 do 10 (zmienna kategoryczna).\
+`OCD `- Deklaracja dotycząca siły OCD respondenta w skali od 0 do 10 (zmienna kategoryczna).\
+`Music effects` - Czy muzyka poprawia/pogarsza stan zdrowia psychicznego respondenta? (zmienna kategoryczna, poziomy: Improve, No Effect, Worsen).\
+`Permissions` - Uprawnienia do publikowania danych (zmienna kategoryczna, 1 poziom.\
+
+Główną kolumną modelowaną przez dane jest `Music effects`.
+
+### College Distance Data
+https://vincentarelbundock.github.io/Rdatasets/csv/AER/CollegeDistance.csv
+https://vincentarelbundock.github.io/Rdatasets/doc/AER/CollegeDistance.html
+
+Ten zbiór danych zawiera dane przekrojowe z badania High School and Beyond przeprowadzonego przez Departament Edukacji USA w 1980 r., z kontynuacją w 1986 r. Badanie obejmowało uczniów z około 1100 szkół średnich. Bada wpływ różnych czynników na średnią odległość od college'u.
+
+Zawiera 4,739 obserwacji 14  zmiennych (w tym 6 ciągłych i 8 kategorycznych)
+
+Zmienne to:\
+`gender` - Płeć (zmienna kategoryczna, poziomy: male, female).\
+`ethnicity` - Pochodzenie etniczne (zmienna kategoryczna, poziomy: afam, hispanic, other).\    
+`score` - Łączny wynik testu z roku bazowego. Są to testy osiągnięć rozdawane uczniom w próbie (zmienna ciągła).\  
+`fcollege` - Czy ojciec jest absolwentem college'u? (zmienna kategoryczna, poziomy: yes, no).\
+`mcollege` - Czy matka jest absolwentką college'u? (zmienna kategoryczna, poziomy: yes, no).\
+`home` - Czy rodzina ma dom na własność? (zmienna kategoryczna, poziomy: yes, no).\
+`urban` - Czy szkoła jest w obszarze zurbanizowanym? (zmienna kategoryczna, poziomy: yes, no).\
+`unemp` - Stopa bezrobocia w regionie w 1980 r (zmienna ciągła).\    
+`wage` - Stanowa stawka godzinowa w przetwórstwie przemysłowym w 1980 r (zmienna ciągła).\        
+`distance` - Odległość od college'u (w 10 mil) (zmienna ciągła).\    
+`tuition` - Średnie stanowe 4-letnie czesne w college'u (w 1000 USD) (zmienna ciągła).\      
+`education` - Ilość lat nauki (zmienna ciągła).\
+`income` - Czy dochód rodziny przekracza 25 000 USD rocznie? (zmienna kategoryczna, poziomy: high, low).\     
+`region` - Region (zmienna kategoryczna, poziomy: west, other)
+
+Główną kolumną modelowaną przez dane jest `distance`.
+
+### Determinants of Wages Data (CPS 1988)
+https://vincentarelbundock.github.io/Rdatasets/csv/AER/CPS1988.csv
+https://vincentarelbundock.github.io/Rdatasets/doc/AER/CPS1988.html
+
+Ten zbiór danych zawiera dane przekrojowe pochodzące z badania bieżącej populacji przeprowadzonego w marcu 1988 r. przez US Census Bureau. Próba obejmuje mężczyzn w wieku od 18 do 70 lat z dodatnim rocznym dochodem większym niż 50 USD w 1992 r., którzy nie pracują na własny rachunek. Jego celem jest określenie determinantów wysokości płac. 
+
+Zawiera 28,155 obserwacji 7 zmiennych (w tym 3 ciągłe i 4 kategoryczne)
+
+Zmienne to:\
+`wage` - Wynagrodzenie (w dolarach tygodniowo) (zmienna ciągła).\
+`education` - Liczba lat nauki (zmienna ciągła).\
+`experience` - Liczba lat potencjalnego doświadczenia zawodowego (zmienna ciągła).\
+`ethnicity` - pochodzenie etniczne (zmienna kategoryczna, poziomy: cauc, afam)\
+`smsa` - Czy dana osoba mieszka w standardowym metropolitalnym obszarze statystycznym (SMSA*)? (zmienna kategoryczna, poziomy: yes, no).\
+`region` - Region (zmienna kategoryczna, poziomy: northeast, midwest, south, west)\
+`parttime` - Czy dana osoba pracuje w niepełnym wymiarze godzin? (zmienna kategoryczna, poziomy: yes, no)
+
+Główną kolumną modelowaną przez dane jest `wage`.
+
+*SMSA: Metropolitalne obszary statystyczne (MSA) obejmują co najmniej jeden obszar zurbanizowany o minimalnej populacji 50 000. Metropolitalny obszar statystyczny (MSA) to formalna definicja regionu, który składa się z miasta i otaczających go społeczności, które są połączone czynnikami społecznymi i ekonomicznymi.  
+
+### Australian Health Service Utilization Data
+https://vincentarelbundock.github.io/Rdatasets/csv/AER/DoctorVisits.csv
+https://vincentarelbundock.github.io/Rdatasets/doc/AER/DoctorVisits.html
+
+Ten zbiór danych zawiera dane przekrojowe pochodzące z Australian Health Survey z lat 1977–1978. Bada wpływ różnych czynników na korzystanie z australijskiej służby zdrowia. 
+
+Zawiera 5,190 obserwacji 12 zmiennych (w tym 6 ciągłych i 6 kategorycznych)
+
+Zmienne to:\
+`visits` - Liczba wizyt u lekarza w ciągu ostatnich 2 tygodni (zmienna ciągła).\
+`gender` - płeć (zmienna kategoryczna, poziomy: male, female).\
+`age` - Wiek w latach podzielony przez 100 (zmienna ciągła).\
+`income` - Roczny dochód w dziesiątkach tysięcy dolarów (zmienna ciągła).\
+`illness` - Liczba zachorowań w ciągu ostatnich 2 tygodni (zmienna ciągła).\
+`reduced` - Liczba dni zmniejszonej aktywności w ciągu ostatnich 2 tygodni z powodu choroby lub urazu (zmienna ciągła).\
+`health` - Wynik kwestionariusza ogólnego stanu zdrowia metodą Goldberga (zmienna ciągła).\
+`private` - Czy dana osoba posiada prywatne ubezpieczenie zdrowotne? (zmienna kategoryczna, poziomy: yes, no).\
+`freepoor`- Czy dana osoba ma bezpłatne rządowe ubezpieczenie zdrowotne ze względu na niskie dochody? (zmienna kategoryczna, poziomy: yes, no).\
+`freerepat` - Czy dana osoba ma bezpłatne rządowe ubezpieczenie zdrowotne ze względu na podeszły wiek, niepełnosprawność lub status weterana? (zmienna kategoryczna, poziomy: yes, no).\
+`nchronic` - Czy badany choruje na przewlekłą choroba, która nie powoduje ograniczenia jego aktywności? (zmienna kategoryczna, poziomy: yes, no).\
+`lchronic` - Czy badany choruje na przewlekłą choroba, która powoduje ograniczenie jego aktywności? (zmienna kategoryczna, poziomy: yes, no).\
+
+Główną kolumną modelowaną przez dane jest `visits`.
+
+## Najlepszy zbiór danych 
+### Airbag and other influences on accident fatalities
+https://vincentarelbundock.github.io/Rdatasets/csv/DAAG/nassCDS.csv
+
+#### Ładowanie danych
+
+```{r}
+Airbags <- read.csv("https://vincentarelbundock.github.io/Rdatasets/csv/DAAG/nassCDS.csv", sep = ",", header = TRUE, stringsAsFactors = TRUE)
+attach(Airbags)
+```
+Ładuję plik CSV z linku internetowego za pomocą funkcji `read.csv` i zapisuję jako "Airbags". Podaję następujące argumenty przy wywoływaniu funkcji:\
+`header = TRUE` - kolumny w pliku mają nagłówki.\
+`sep = ","`- separator danych to ",".\
+`stringsAsFactors = TRUE` - odczytuje kolumny z napisami jako kolumna typu factor.
+
+#### Omówienie danych 
+
+Tez zbiór danych obejmuję dane z USA za lata 1997-2002, pochodzące ze zgłoszonych przez policję wypadków samochodowych, w których doszło do zdarzenia powodującego szkodę (osób lub mienia), i z którego odholowano co najmniej jeden pojazd. Dane są ograniczone do osób na przednich siedzeniach i obejmują tylko pewien podzbiór zarejestrowanych zmiennych. Jego celem jest sprawdzenie, czy istnieje statystycznie istotny korzystny wpływ obecności poduszek powietrznych na prawdopodobieństwo przeżycia wypadku.
+ 
+```{r}
+head(Airbags)
+```
+
+Zbiór składa się z 16 kolumn:\
+`X` - numer obserwacji.\
+`dvcat` - szacowana prędkość uderzenia.\
+`weight` - wagi obserwacji - zaprojektowane w celu uwzględnienia różnych prawdopodobieństw pobierania próbek.\
+`dead` - czy dana osoba przeżyła wypadek?\
+`airbag` - obecność/nieobecność poduszki powietrznej w pojeździe.\
+`seatbelt` - czy pasy bezpieczeństwa były zapięte?\
+`frontal` - czy zderzenie było czołowe?\
+`sex` - płeć.\
+`ageOFocc` - wiek.\
+`yearacc` - rok wypadku.\
+`yearVeh` - rok modelowy pojazdu.\
+`abcat` - Czy zadziałała jedna lub więcej poduszek powietrznych (kierowcy lub pasażera)?\
+`occRole` - Czy dana osoba była kierowcą, czy pasażerem?\
+`deploy` - Przyjmuję wartość 0, jeśli poduszka powietrzna była niedostępna lub nie zadziałała oraz wartość 1, jeśli uruchomiono jedną lub więcej poduszek.\
+`injSeverity` - Ocena ciężkości urazu.\
+`caseid` - ID danej sprawy - pozwala zidentyfikować dany pojazd.
+
+Główną kolumną modelowaną przez dane jest `dead` (w dalszej kolejności `injSeverity`). Zadaniem tego zbioru danych jest sprawdzenie, jak różne czynniki wpływają na prawdopodobieństwo przeżycia wypadku. Kluczowych dodatkowych atrybutów dostarczają kolumny dotyczące działania poduszek powietrznych: `airbag`, `abcat`, `deploy`. Ważne są również kolumny związana z okolicznościami zdarzenia jak: `dvcat`, `seatbelt`, `frontal`, `occRole`. 
+
+#### Główne statystyki odczytanych danych 
+
+```{r}
+str(Airbags)
+```
+
+Zbiór danych zwiera 26217 obserwacji 16 zmiennych (8 typu `factor`, 7 typu `integer` i 1 typu `numeric` )\
+
+##### Kolumna `dead`
+
+```{r}
+str(dead)
+```
+
+Główna kolumna danych `dead` jest zmienną kategoryczną typu `factor` z 2 poziomami:\
+"alive" - osoba przeżyła wypadek.\
+"dead" - osoba zmarła.
+
+```{r}
+summary(dead)
+barplot(summary(dead), col = "lightblue", main = "Czy osoba przeżyła wypadek?", ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `X
+`
+```{r}
+str(X)
+summary(X)
+```
+
+Kolumna `X` jest zmienną ciągłą typu `integer`. Składa się z liczb całkowitych od 1 do 26217, będącymi numerami poszczególnych obserwacji. 
+
+##### Kolumna `dvcat`
+
+```{r}
+str(dvcat)
+levels(dvcat)
+```
+
+Kolumna `dvcat` jest zmienną kategoryczną typu `factor` z 5 poziomami:\
+1-9km/h\
+10-24\
+25-39\
+40-54\
+55+\
+Odnoszą się one do szacowanej prędkości uderzenia w km/h.
+
+```{r}
+summary(dvcat)
+barplot(summary(dvcat), col = "lightblue", main = "Prędkość uderzenia (km/h)", xlab = "przedziały prędkości", ylab = "częstotliwość")
+```
+
+##### Kolumna `weight`
+
+```{r}
+str(weight)
+summary(weight)
+```
+
+Kolumna `weight` jest zmienną ciągłą typu `numeric`. Składa się z liczb  od 0 do 57871.59, będącymi wagami poszczególnych obserwacji. 
+
+##### Kolumna `airbag`
+
+```{r}
+str(airbag)
+```
+
+Kolumna `airbag` jest zmienną kategoryczną typu `factor` z 2 poziomami:\
+"airbag" - poduszka powietrzna była obecna w pojeździe.\
+"none" - poduszka powietrzna nie była obecna w pojeździe.
+
+```{r}
+summary(airbag)
+barplot(summary(airbag), col = "lightblue", main = "Czy w pojeździe obecna była poduszka powietrzna?", ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `seatbelt`
+
+```{r}
+str(seatbelt)
+```
+
+Kolumna `seatbelt` jest zmienną kategoryczną typu `factor` z 2 poziomami:\
+"belted" - pasy bezpieczeństwa były zapięte.\
+"none" - pasy bezpieczeństwa nie były zapięte.
+
+```{r}
+summary(seatbelt)
+barplot(summary(seatbelt), col = "lightblue", main = "Czy pasy bezpieczeństwa były zapięte?", ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `frontal` 
+
+```{r}
+str(frontal)
+summary(frontal)
+```
+
+Kolumna `frontal` jest zasadniczo zmienną kategoryczną typu `integer`, przyjmującą wartości 0 lub 1.\
+"0" - zderzenie nie było czołowe.\
+"1" - zderzenie czołowe.\
+Łatwiej zaprezentować te dane po zmianie typu na `factor`:
+
+```{r}
+frontal_as_factor <- as.factor(frontal)
+barplot(summary(frontal_as_factor), col = "lightblue", main = "Czy zderzenie było czołowe?", ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `sex`
+
+```{r}
+str(sex)
+```
+
+Kolumna `sex` jest zmienną kategoryczną typu `factor` z 2 poziomami:\
+"f" - kobieta.\
+"m" - mężczyzna.\
+
+```{r}
+summary(sex)
+barplot(summary(sex), col = "lightblue", main = "Płeć" , ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `ageOFocc`
+
+```{r}
+str(ageOFocc)
+summary(ageOFocc)
+hist.default(ageOFocc, col = "lightblue", main = "Wiek (w latach)", border = "white", ylab = "częstotliwość", xlab = "wartość zmiennej", breaks = seq(15,100, by=5))
+```
+
+Kolumna `ageOFocc` jest  zmienną ciągłą typu `integer`. Składa się z liczb całkowitych od 15 do 100, które oznaczają wiek danej osoby. 
+
+##### Kolumna `yearacc`
+
+```{r}
+str(yearacc)
+summary(yearacc)
+hist.default(yearacc, col = "lightblue", main = "Rok Wypadku", border = "white", ylab = "częstotliwość", xlab = "wartość zmiennej", breaks = seq(1997,2002, by=1))
+```
+
+Kolumna `yearacc` jest w  zmienną ciągłą typu `integer`. Składa się z liczb całkowitych od 1997 do 2002, które oznaczają rok wypadku.
+
+##### Kolumna `yearVeh`
+
+```{r}
+str(yearVeh)
+summary(yearVeh)
+hist.default(yearVeh, col = "lightblue", main = "Rok modelowy pojazdu", border = "white", ylab = "częstotliwość", xlab = "wartość zmiennej", breaks = seq(1950,2003, by=1))
+```
+
+Kolumna `yearVeh` jest  zmienną ciągłą typu `integer`. Składa się z liczb całkowitych od 1950 do 2003, które oznaczają rok modelowy pojazdu.
+
+##### Kolumna `abcat`
+
+```{r}
+str(abcat)
+levels(abcat)
+```
+
+Kolumna `abcat` jest zmienną kategoryczną typu `factor` z 3 poziomami:\
+"deploy" - co najmniej jedna poduszka powietrzna zadziałała.\
+"nodeploy" - żadna poduszka nie zadziałała.\
+"unavail" - poduszka nie była dostępna.\
+
+```{r}
+summary(abcat)
+barplot(summary(abcat), col = "lightblue", main = "Działanie poduszek powietrznych" , ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `occRole`
+
+```{r}
+str(occRole)
+```
+Kolumna `occRole` jest zmienną kategoryczną typu `factor` z 2 poziomami:\
+"driver" - osoba była kierowcą.\
+"pass" - osoba była pasażerem.\
+
+```{r}
+summary(occRole)
+barplot(summary(occRole), col = "lightblue", main = "Rola osoby w pojeździe" , ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+
+##### Kolumna `deploy` 
+
+```{r}
+str(deploy)
+summary(deploy)
+```
+
+Kolumna `deploy` jest zasadniczo zmienną kategoryczną typu `integer`, przyjmującą wartości 0 lub 1.\
+"0" - poduszka powietrzna była niedostępna lub nie zadziałała.\
+"1" - uruchomiono jedną lub więcej poduszek.\
+Łatwiej zaprezentować te dane po zmianie typu na `factor`:
+
+```{r}
+deploy_as_factor <- as.factor(deploy)
+barplot(summary(deploy_as_factor), col = "lightblue", main = "Działanie poduszek powietrznych (według zmiennej deploy)", ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+
+##### Kolumna `injSeverity` 
+
+```{r}
+str(injSeverity)
+summary(injSeverity)
+```
+
+Kolumna `injSeverity` jest zasadniczo zmienną kategoryczną typu `integer`, przyjmującą wartości od 0 do 6:\
+"0" - brak obrażeń.\
+"1" - możliwe obrażenia.\
+"2" - stopień przed inwalidztwem.\
+"3" - inwalidztwo.\
+"4" - śmierć na skutek wypadku.\
+"5" - nieznane.\
+"6" - wcześniejsza śmierć.\
+Łatwiej zaprezentować te dane po zmianie typu na `factor`:
+
+```{r}
+injSeverity_as_factor <- as.factor(injSeverity)
+barplot(summary(injSeverity_as_factor), col = "lightblue", main = "Odniesione obrażenia", ylab = "częstotliwość", xlab = "wartość zmiennej")
+```
+
+##### Kolumna `caseid`
+
+```{r}
+str(caseid)
+```
+
+Kolumna `caseid` jest zasadniczo zmienną ciągłą typu `factor` oznaczającą ID danego wypadku. 
+
+
+## Brakujące dane 
+
+```{r}
+summary(Airbags)
+sum(is.na(Airbags))
+sum(is.null(Airbags))
+sum(is.na(yearVeh))
+sum(is.na(injSeverity))
+
+```
+
+W całym zbiorze są 154 brakujące dane oznaczone jako `NA`:\
+W kolumnie `yearVeh` - 1 NA. Brakuje roku modelowego jednego z pojazdów.\
+W kolumnie `injSeverity`- 153 NA. W tych przypadkach nie ma danych co do obrażeń odniesionych przez ofiarę wypadku.\
+Ten zbiór danych ma więc bardzo niewiele brakujących danych (154 na 26217 obserwacji).
+
+
+## Powtarzalne dane
+
+W kolumnach `abcat` i `deploy` prezentowane są w zasadzie te same dane tylko inaczej kodowane:
+
+`abcat`\
+"deploy" - co najmniej jedna poduszka powietrzna zadziałała.\
+"nodeploy" - żadna poduszka nie zadziałała.\
+"unavail" - poduszka nie była dostępna.\
+
+`deploy`\
+"0" - poduszka powietrzna była niedostępna lub nie zadziałała.\
+"1" - zadziała jedna lub więcej poduszek.\
+
+Prawdopodnie zmienna `deploy` została stworzona w celu uproszczenia obliczeń.
+
+## Dane odstające
+
+Jedyne kolumny, dla których mierzenie danych odstających jest sensowne to:\
+- `weight`\
+- `ageOFocc`\
+- `yearVeh`\
+
+### Kolumna `weight`
+
+```{r}
+boxplot.default(weight,col = "lightblue",main = "Wagi obserwacji", outcex=2, outcol="darkblue")
+summary(weight)
+```
+
+Wagi przypisane poszczególnym obserwacjom znacząco się od siebie różnią i wiele z nich wyraźnie odstaje od średniej. Przyjmują wartości od 0 do 57871.59 przy średniej 462.81. Trudno powiedzieć coś więcej bez wiedzy na temat metodologii ustanawiania tych wag przez badaczy. Bez tego ani średnia, ani wykres nie są specjalnie pomocne. 
+
+### Kolumna `ageOFocc`
+
+```{r}
+boxplot.default(ageOFocc,col = "lightblue",main = "Wiek (w latach)", outcex=2, outcol="darkblue")
+summary(ageOFocc)
+
+```
+
+W przypadku wieku badanych nie ma żadnych danych, które znacząco odstają od średniej. Można jednak zaobserwować, że wypadki zdarzają się zdecydowanie częściej osobom w średnim wieku niż tym bardzo starym (szczególnie 85+, gdzie takie wydarzenie należy uznać za zaskakujące).
+
+### Kolumna `yearVeh`
+
+```{r}
+boxplot.default(yearVeh,col = "lightblue",main = "Rok modelowy pojazdu", outcex=2, outcol="darkblue")
+summary(yearVeh)
+```
+
+W przypadku roku modelowego pojazdu można zaobserwować grupę wyjątkowo starych aut, które brały udział w wypadkach. 
+
+

@@ -1,0 +1,219 @@
+---
+title: "Bartosz Cieśla - Raport"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+load("Boston.RData")
+
+```
+
+## Zadanie 1 
+```{r, echo=FALSE, results='hide'}
+nrow(Boston) #506 obserwacji
+ncol(Boston) #13 zmiennych
+str(Boston) 
+```
+506 obserwacji\
+13 zmiennych 
+
+## Zadanie 2 
+```{r, echo=FALSE, results='hide'}
+attach(Boston)
+mean(TAX) #408.2372
+var(TAX) #28404.76
+cov(TAX,MEDV) #-726.2557
+```
+Średnia zmiennej `TAX` - 408.2372\
+Wariancja zmiennej `TAX` - 28404.76\
+Kowariancja zmiennych `TAX` oraz MEDV - -726.2557
+
+## Zadanie 3 
+```{r, echo=FALSE, results='hide'}
+median(PTRATIO) #19.05
+quantile(PTRATIO,1/4) #17.4
+quantile(PTRATIO,3/4) #20.2 
+```
+Mediana zmiennej `PTRATIO` - 19.05\
+Pierwszy kwartyl zmiennej `PTRATIO` - 17.4\
+Trzeci kwartyl zmiennej `PTRATIO` - 20.2 
+
+## Zadanie 4  
+Histogram zmiennej `DIS`:
+
+```{r, echo=FALSE}
+hist(DIS, breaks = seq(0,14, by=1), col = "lightblue", border = "white", 
+     main = "Średnia ważona odległości od 5 centrów zatrudnienia", xlab="Odległość", ylab="Częstotliwość")
+```
+
+Modelowanie tej zmiennej przy użyciu rozkładu normalnego nie wydaję się być rozsądne. Zmienna wizualnie nie przypomina rozkładu normalnego - nie ma charakterystycznego "garba". 
+
+## Zadanie 5 
+```{r, echo=FALSE}
+plot(ecdf(DIS), main="Dystrybuanta empiryczna zmiennej DIS", col="lightblue")
+```
+
+## Zadanie 6 
+Wykres pudełkowy zmiennej `AGE`:
+
+```{r, echo=FALSE}
+boxplot(AGE, col="lightblue", main="Odsetek lokali własnościowych wybudowanych przed 1940 rokiem", outcex=2, outcol="darkblue")
+```
+
+Nie ma żadnych wartości, które można uznać za odstające 
+
+## Zadanie 7 
+
+```{r, echo=FALSE, results='hide'}
+mean(RM) #6.284634
+var(RM) #0.4936709
+```
+Jeżeli dane są modelowane według rozkładu normalnego to estymator największej wiarygodności to średnia i wariancja z obserwacji.\
+Estymator największej wiarygodności dla parametru $\mu$ - 6.284634\
+Estymator największej wiarygodności dla parametru $\sigma$ - 0.4936709
+
+## Zadanie 8 
+Przedział ufności dla parametru $\mu$ na poziomie 99% - 6.204178 6.365091
+
+```{r, echo=FALSE, results='hide'}
+barx <- mean(RM)
+#skoro 1-alpha=99%, to alpha=1%
+z99.5 <- qnorm(.995) 
+n <- length(RM)
+Sigma <- sd(RM)
+
+#Odpowiedź:
+c(
+  barx - z99.5/sqrt(n) * Sigma,
+  barx + z99.5/sqrt(n) * Sigma
+)
+```
+
+## Zadanie 9 
+Wykresy pudełkowe zmiennej `MEDV`:
+
+```{r, echo=FALSE}
+boxplot.default(MEDV[CHAS==1], MEDV[CHAS==0], col = "lightblue",outcol = "darkblue",
+outcex=2, main="Sąsiedztwo rzeki a cena mieszkań", xlab="Obszar graniczący z rzeką              Obszar nie graniczący z rzeką",ylab = "w tysiącach USD")
+```
+
+Z wykresu wynika, że sąsiedztwo rzeki powoduję zauważalny wzrost cen mieszkań. Można zaobserwować również przypadki bardzo drogich budynków, które nie są umiejscowione w pobliżu rzeki - wyróżniają się one na tle okolicy.
+
+## Zadanie 10 
+Test hipotezy o równości średnich zmiennej `MEDV` dla obszarów graniczących z `Charles River` i pozostałych na poziomie istotności 1%:
+
+```{r, echo=FALSE, results='hide'}
+Near_River <- MEDV[CHAS==1]
+Far_From_River <- MEDV[CHAS==0]
+Test.1 <- t.test(Near_River,Far_From_River,alternative = "two.sided")
+print(Test.1)
+print(Test.1$p.value) # 0.00356717
+```
+Wartość $p$ - 0.00356717\
+Przy zakładanym poziomie istotności 1% odrzucamy hipotezę zerową o równości średnich. 
+
+## Zadanie 11
+Test normalności zmiennej `AGE`:
+
+```{r,echo=FALSE}
+qqnorm(AGE, main = "Wykres kwantylowy zmiennej AGE", col="lightblue")
+```
+
+Na wykresie można zaobserwować istotne odstępstwo punktów od linii prostej, co świadczy
+przeciw normalności.
+
+Test Shapiro-Wilka:
+```{r,echo=FALSE, results='hide'}
+ShapiroTest.1 <- shapiro.test(AGE)
+print(ShapiroTest.1)
+print(ShapiroTest.1$p.value) #2.230765e-18
+```
+Wartość $p$ - 2.230765e-18\
+Przy zakładanym poziomie istotności 1% wynik testu daje podstawy do odrzucenia hipotezy zerowej o normalności rozkładu.\
+Założenie, że ta zmienna ma rozkład normalny, nie byłoby rozsądne. 
+
+## Zadanie 12 
+
+Wykres punktowy zmiennych MEDV i RM:
+
+```{r,echo=FALSE}
+library(ggplot2)
+ggplot((plot(MEDV,RM)), aes(MEDV,RM)) +
+geom_point() 
+
+```
+
+```{r,echo=FALSE}
+A <- cov(RM, MEDV) / var(RM, MEDV)
+B <- mean(MEDV) - A*mean(RM)
+```
+
+Równanie najlepiej dopasowanej prostej:
+$y=1x+16.25$
+
+Wykres z najlepiej dopasowaną prostą:
+
+```{r,echo=FALSE}
+ggplot((plot(MEDV,RM)), aes(MEDV,RM)) +
+geom_point() +
+geom_smooth(method="lm")
+```
+
+## Zadania 13 
+
+```{r, echo=FALSE, results='hide'}
+lm(MEDV~., data = Boston  )
+```
+
+Ujemny współczynnik znajduję się przy następujących zmiennych\: 
+
+CRIM: -0.121389
+
+NOX: -18.758022  
+
+DIS: -1.490754 
+
+TAX: -0.012682 
+
+PTRATIO: -0.937533  
+
+LSTAT: -0.552019 
+
+Wyniki pozwalają założyć, że na mediane wartości domów w danym rejonie negatywnie wpływa:\
+- współczynnik przestępczości w danym obszarze\
+- stężenie tlenków azotu\
+- odległości do pięciu bostońskich centrów zatrudnienia\
+- stawka pełnowartościowego podatku od nieruchomości\
+- stosunek liczby uczniów do nauczycieli\
+- % ludności o niższym statusie społecznym\
+
+Jest to jak najbardziej zgodne z intuicją. Powyższe zmienne bezpośrednio wpływają na jakość życia w danych regionie - czym wyższe ich wartości, tym jest ona niższa. Dlatego wpływają negatywnie na ceny domów.
+
+## Zadanie 14
+
+Tabela zmiennych pomocniczych RM_cat i AGE_cat:
+
+```{r,echo=FALSE}
+RM_cat <- cut(RM, breaks = c((min(RM)),5.8,6.6,(max(RM))),labels = c("low","medium","high"),include.lowest = TRUE)
+AGE_cat <- cut(AGE, breaks = c((min(AGE)),45,95,(max(AGE))),labels = c("low","medium","high"),include.lowest = TRUE)
+table(RM_cat,AGE_cat)
+```
+
+Test niezależności zmiennych RM_cat i AGE_cat:
+
+```{r,echo=FALSE,results='hide'}
+Test.2 <- chisq.test(RM_cat,AGE_cat)
+print(Test.2)
+print(Test.2$p.value)
+```
+Wartość $p$ - 4.475e-10\
+Przy zakładanym poziomie istotności 1% odrzucamy hipotezę zerową o niezależności zmiennych. 
+
