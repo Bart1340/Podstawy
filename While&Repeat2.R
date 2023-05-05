@@ -22,7 +22,4 @@ repeat {
   }
 }
 
-#Tutaj też nie jestem do końca pewien, jaka jest różnica 
-#Pętla "while" sprawdza za każdym razem, czy warunek jest prawdziwy i rozpoczyna się tylko wtedy, gdy tak jest.
-#Natomiast pętla "repeat" za pomocą "if" sprawdza, czy warunek jest nieprawdziwy i jeżeli tak, to przerywa pętle za pomocą "break".
 
