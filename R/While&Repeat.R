@@ -36,6 +36,4 @@ repeat {
   }
 }
 
-#Trudno mi powiedzieć, czym różnią się te dwie wersje kodu - w powyższych przykładach działają w zasadzie tak samo.
-#(Oprócz tego, że w "While" można kontrolować warunek rozpoczęcia pętli)
 
